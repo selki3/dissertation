@@ -9,6 +9,7 @@ from QuestionController import QuestionController
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        
 
         layout = QVBoxLayout()
         self.window = None  # No external window yet.
@@ -74,6 +75,7 @@ class QuestionnaireWindow(QMainWindow):
         super().__init__()
         self.group_box = QGroupBox("Grid")
         q_controller = QuestionController(14) 
+        question_model = QuestionModel()
 #        
         windowLayout = QVBoxLayout() 
         self.horizontalGroupBox = QGroupBox("Warwick-Edinburgh Mental Wellbeing Scale (WEMWBS)")
@@ -175,7 +177,7 @@ class QuestionnaireWindow(QMainWindow):
 
         self.continue_button = QPushButton('Continue')
         self.grid_layout.addWidget(self.continue_button)
-        self.continue_button.clicked.connect(lambda: q_controller.create_answer())
+        self.continue_button.clicked.connect(lambda: question_model.digital_twin_training())
 
         self.horizontalGroupBox.setLayout(self.grid_layout)
         self.horizontalGroupBox.show()
