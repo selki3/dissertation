@@ -1,16 +1,18 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QRadioButton, QVBoxLayout, QWidget, QMessageBox, QLabel, QRadioButton, QHBoxLayout, QGroupBox, QGridLayout, QPushButton, QButtonGroup
+from PyQt5 import QtGui
+
 
 # Only needed for access to command line arguments
 import sys
 from information_processor_model import QuestionModel
 from QuestionController import QuestionController
 
+
 # Subclass QMainWindow to customize your application's main window
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         
-
         layout = QVBoxLayout()
         self.window = None  # No external window yet.
         self.exit = False 
@@ -19,12 +21,17 @@ class MainWindow(QMainWindow):
         self.questionnaire_button = QPushButton("Answer a questionnaire")
         self.questionnaire_button.clicked.connect(self.show_new_window)
 
+        question_model = QuestionModel()
+        self.result_button = QPushButton("Show me my results")
+        self.result_button.clicked.connect(lambda: question_model.digital_twin_training())
+
         self.exit_button = QPushButton("Exit")
         self.msg = QWidget()
         self.msg = self.exit_button.clicked.connect(self.generatePopUpBox)
     
         # Adding widgets to the layout 
         layout.addWidget(self.questionnaire_button)
+        layout.addWidget(self.result_button)
         layout.addWidget(self.exit_button)
         # Set the central widget of the Window.
         widget = QWidget()
@@ -76,6 +83,8 @@ class QuestionnaireWindow(QMainWindow):
         self.group_box = QGroupBox("Grid")
         q_controller = QuestionController(14) 
         question_model = QuestionModel()
+
+        self.setWindowTitle("Enter your answers")
 #        
         windowLayout = QVBoxLayout() 
         self.horizontalGroupBox = QGroupBox("Warwick-Edinburgh Mental Wellbeing Scale (WEMWBS)")
@@ -92,6 +101,11 @@ class QuestionnaireWindow(QMainWindow):
         self.grid_layout.addWidget(QLabel('Some of the time'), 0, 3)
         self.grid_layout.addWidget(QLabel('Often'), 0, 4)
         self.grid_layout.addWidget(QLabel('All the time'), 0, 5)
+
+        for i in range(self.grid_layout.count()):
+            widget = self.grid_layout.itemAt(i).widget()
+            if isinstance(widget, QLabel):
+                widget.setFont(QtGui.QFont("Times",weight=QtGui.QFont.Bold))
 
         # Labels
         self.model = QuestionModel(question="I am feeling optimistic about the future")
