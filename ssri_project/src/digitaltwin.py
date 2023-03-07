@@ -1,37 +1,41 @@
 import datetime as dt
-
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.dates import AutoDateLocator, DateFormatter, datestr2num
 from sklearn.tree import DecisionTreeRegressor
 
-
 # Doing a regression predictor 
 # Using a decision tree 
 class DigitalTwin: 
     # Possibly consider using a dictionary instead of a list for mean? 
-    def __init__(self, column_list, training_data):
+    def __init__(self, column_list):
         self.column_list = column_list
-        self.mean_list_of_all_scores = self.total_scores(training_data)
         
     # Average the score
     def total_scores(self, training_data): 
         # List that will contain the mean score 
         date_list = [] 
         mean_list = [] 
+        antidepressant_list = []
+
         # Can't guarantee entries will be a certain order in a dictionary 
         for entry_dict in training_data:
+            # Making an assumption that there will always be one date and one score
             counter = 0
             for column_name, value in entry_dict.items():
                 if column_name in self.column_list:
                     counter += value
                 if column_name == 'date': 
                     date_list.append(value)
+                if column_name == 'antidepressant':
+                    antidepressant_list.append(value)
             mean_list.append(counter/len(self.column_list))
             print(date_list)
+
         self.fit_regression_model(mean_list, date_list)
-        return mean_list, date_list 
-    
+        return antidepressant_list, mean_list, date_list
+
+
     # X will be the overall score 
     def fit_regression_model(self, dataset, dates):
         y = np.array(dataset).reshape(-1, 1)
@@ -62,9 +66,11 @@ class DigitalTwin:
         ax.set_title("Decision Tree Regression to show wellbeing results")
         ax.set_xlabel("Time")
         ax.set_ylabel("Overall Score")
+        ax.set_ylim([0, 5])
         ax.xaxis_date() 
         ax.xaxis.set_major_locator(
             AutoDateLocator(minticks = 3, interval_multiples = False))
+        ax.set_xticklabels(ax.get_xticks(), rotation = 45)
         ax.xaxis.set_major_formatter(DateFormatter("%d/%m/%y"))
 
         ax.legend()
