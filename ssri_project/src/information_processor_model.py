@@ -51,7 +51,23 @@ class QuestionModel(QtCore.QAbstractListModel):
             res = con.execute("SELECT * FROM wellbeing")
             res = res.fetchall()
         return res 
+
+    # Refactor this later 
+    def construct_data_dictionary(self, antidepressant_list, score_list, date_list):    
+        score_dictionary = dict()
+        for i in range(len(antidepressant_list)):
+            antidepressant = antidepressant_list[i]
+            score = score_list[i]
+            date = date_list[i]
+            if antidepressant not in score_dictionary:
+                score_dictionary[antidepressant] = []
+            score_dictionary[antidepressant].append((date, score))
+        print(score_dictionary)
+        return score_dictionary
     
     def digital_twin_training(self):
         training_data = self.get_all_values()
-        digital_twin = DigitalTwin(self.column_list, training_data)
+        digital_twin = DigitalTwin(self.column_list)
+        total_scores = digital_twin.total_scores(training_data)
+        print(total_scores)
+        self.construct_data_dictionary(total_scores[0], total_scores[1], total_scores[2])    
