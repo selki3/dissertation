@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QRadioButton, QVBoxLayout, QWidget, QMessageBox, QLabel, QRadioButton, QHBoxLayout, QGroupBox, QGridLayout, QPushButton, QButtonGroup, QComboBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QRadioButton, QVBoxLayout, QWidget, QMessageBox, QLabel, QRadioButton, QHBoxLayout, QGroupBox, QGridLayout, QPushButton, QButtonGroup, QComboBox, QLabel, QLineEdit
 from PyQt5 import QtGui
 
 
@@ -6,7 +6,9 @@ from PyQt5 import QtGui
 import sys
 from information_processor_model import QuestionModel
 from QuestionController import QuestionController
+from user_model import UserModel
 
+logged_in = False 
 
 # Subclass QMainWindow to customize your application's main window
 class MainWindow(QMainWindow):
@@ -17,23 +19,39 @@ class MainWindow(QMainWindow):
         self.window = None  # No external window yet.
         self.exit = False 
 
-        self.setWindowTitle("SSRI Project")
-        self.questionnaire_button = QPushButton("Answer a questionnaire")
-        self.questionnaire_button.clicked.connect(self.show_new_window)
+        self.setWindowTitle("Welcome")
 
-        question_model = QuestionModel()
-        self.result_button = QPushButton("Show me my results")
-        self.result_button.clicked.connect(lambda: question_model.digital_twin_training())
+        self.setWindowTitle("SSRI Project")
+
+        if logged_in:
+            self.questionnaire_button = QPushButton("Answer a questionnaire")
+            self.questionnaire_button.clicked.connect(self.show_new_window)
+
+            question_model = QuestionModel()
+            self.result_button = QPushButton("Show me my results")
+            self.result_button.clicked.connect(lambda: question_model.digital_twin_training())
+
+        
+            # Adding widgets to the layout 
+            layout.addWidget(self.questionnaire_button)
+            layout.addWidget(self.result_button)
+            # Set the central widget of the Window.
+        
+        if not logged_in:
+            self.sign_in_button = QPushButton("Log in")
+            #self.sign_in_button.clicked.connect()
+
+            self.register_button = QPushButton("Register")
+            self.register_button.clicked.connect(self.show_register_window)
+
+            layout.addWidget(self.sign_in_button)
+            layout.addWidget(self.register_button)
 
         self.exit_button = QPushButton("Exit")
         self.msg = QWidget()
         self.msg = self.exit_button.clicked.connect(self.generatePopUpBox)
-    
-        # Adding widgets to the layout 
-        layout.addWidget(self.questionnaire_button)
-        layout.addWidget(self.result_button)
         layout.addWidget(self.exit_button)
-        # Set the central widget of the Window.
+
         widget = QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
@@ -54,20 +72,88 @@ class MainWindow(QMainWindow):
             sys.exit()
             app.exit()
 
+    def show_welcome_window(self):
+        self.window = MainWindow()
+        window.show()
+
     def show_new_window(self): 
+        self.hide()
         if self.window is None:
             self.window = QuestionnaireWindow()
         self.window.show()
+
+    def show_register_window(self):
+        self.hide()
+        if self.window is None:
+            self.window = RegisterWindow()
+        self.window.show()
+
+class RegisterWindow(QMainWindow): 
+     def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Register')
+
+        layout = QGridLayout()
+        self.username = QLabel("Username")
+        self.input_username = QLineEdit()
+
+        self.password = QLabel("Password")
+        self.input_password = QLineEdit()
+
+        self.button_login = QPushButton("Sign up now")
+        self.button_login.clicked.connect(lambda: UserModel().create_user(self.input_username.text(), self.input_password.text()))
+        self.button_login.clicked.connect(lambda: MainWindow.show_welcome_window(self))
+
+        layout.addWidget(self.username, 0, 0)
+        layout.addWidget(self.input_username, 0, 1)
+
+        layout.addWidget(self.password, 1, 0)
+        layout.addWidget(self.input_password, 1, 1)
+        layout.addWidget(self.button_login, 2, 0)
+        
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+
+# class LoginWindow(QMainWindow):
+#     def __init__(self):
+#         super().__init__()
+#         self.setWindowTitle('Logging in')
+
+#         layout = QGridLayout()
+#         self.username = QLabel("Username")
+#         self.input_username = QLineEdit()
+
+#         self.password = QLabel("Password")
+#         self.input_password = QLineEdit()
+
+#         self.button_login = QPushButton("Login now")
+#         self.button_login.clicked.connect(lambda: attempt = UserModel().login(self.input_username.text(), self.input_password.text()):
+#                                                                     global logged_in True if (attempt == True) else None)
+#         #self.button_login.clicked.connect(global logged_in = True)
+
+#         layout.addWidget(self.username, 0, 0)
+#         layout.addWidget(self.input_username, 0, 1)
+
+#         layout.addWidget(self.password, 1, 0)
+#         layout.addWidget(self.input_password, 1, 1)
+#         layout.addWidget(self.button_login, 2, 0)
+        
+#         widget = QWidget()
+#         widget.setLayout(layout)
+#         self.setCentralWidget(widget)
+    
+
 
 class QuestionnaireWindow(QMainWindow):
     def generate_likert_scale(self, label, row, radio_number):
         button_group = QButtonGroup()
         self.grid_layout.addWidget(label, row, 0)
 
-        for i in range(radio_number): 
+        for i in range(1, radio_number+1): 
             rb = QRadioButton(str(i))
             button_group.addButton(rb)
-            self.grid_layout.addWidget(rb, row, i+1)
+            self.grid_layout.addWidget(rb, row, i)
 
         return button_group
 
@@ -76,19 +162,20 @@ class QuestionnaireWindow(QMainWindow):
             if button.isChecked():
                 return button 
     
-    # hopefully a temporary function lol             
 
     def __init__(self):
         super().__init__()
         self.group_box = QGroupBox("Grid")
-        q_controller = QuestionController(15) 
+        q_controller = QuestionController(14, None) 
         question_model = QuestionModel()
-
-        self.setWindowTitle("Enter your answers")
 #        
+        overall_scores = [] 
+
         windowLayout = QVBoxLayout() 
         self.horizontalGroupBox = QGroupBox("Warwick-Edinburgh Mental Wellbeing Scale (WEMWBS)")
         windowLayout.addWidget(self.horizontalGroupBox)
+        self.setWindowTitle("Enter your answers")
+
 
         self.grid_layout = QGridLayout()
         self.grid_layout.setColumnStretch(1, 4)
@@ -99,6 +186,10 @@ class QuestionnaireWindow(QMainWindow):
         self.model = QuestionModel(question="What type of antidepressant are you on?")
         self.question = QLabel(self.model.data())
         self.combo_box = QComboBox(self)
+
+        self.combo_box.activated[str].connect(lambda: q_controller.change_medication(
+            self.combo_box.currentText()))
+
         self.combo_box.addItems(antidepressants_list)
         self.grid_layout.addWidget(self.question, 0, 0)
         self.grid_layout.addWidget(self.combo_box, 0, 1)
@@ -152,7 +243,7 @@ class QuestionnaireWindow(QMainWindow):
         self.button_group6.buttonClicked.connect(lambda: q_controller.extract_information(self.button_group6.checkedId(), 6))
 
         
-        self.question7 = QuestionModel(question="I've been thinking clearly")
+        self.model = QuestionModel(question="I've been thinking clearly")
         self.question7 = QLabel(self.model.data())
         self.button_group7 = self.generate_likert_scale(self.question7, 8, 5)
         self.button_group7.buttonClicked.connect(lambda: q_controller.extract_information(self.button_group7.checkedId(), 7))
@@ -198,10 +289,9 @@ class QuestionnaireWindow(QMainWindow):
         self.button_group14 = self.generate_likert_scale(self.question14, 15, 5)
         self.button_group14.buttonClicked.connect(lambda: q_controller.extract_information(self.button_group14.checkedId(), 14))
 
-
         self.continue_button = QPushButton('Continue')
         self.grid_layout.addWidget(self.continue_button)
-        self.continue_button.clicked.connect(lambda: question_model.digital_twin_training())
+        self.continue_button.clicked.connect(lambda: question_model.digital_twin_training(q_controller.answers, q_controller.medication))
 
         self.horizontalGroupBox.setLayout(self.grid_layout)
         self.horizontalGroupBox.show()
@@ -212,8 +302,4 @@ app = QApplication([])
 
 window = MainWindow()
 window.show()
-
-# question1 = QLabel("I am feeling optimistic about the future")
-# QuestionnaireWindow.generate_likert_scale(question1, 0)
-
 app.exec()
