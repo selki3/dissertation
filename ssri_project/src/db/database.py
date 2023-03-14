@@ -45,12 +45,25 @@ cur.execute(wellbeing_table)
 # Input placeholder values
 # Not committing right now 
 user_sql = "INSERT INTO user (id, username, password) VALUES (1, 'username', 'password')"
-wellbeing_sql = "INSERT INTO wellbeing (id, user_id, date, antidepressant, question1, question2, question3, question4, question5, question6, question7, question8, question9, question10, question11, question12, question13, question14) VALUES (1, 1, '2023-01-28 23:59:00.000', 'citalopram', 1, 2, 3, 4, 5, 1, 2, 2, 3, 1, 4, 4, 5, 4)"
 
 cur.execute(user_sql)
+
+wellbeing_sql = "INSERT INTO wellbeing (id, user_id, date, antidepressant, question1, question2, question3, question4, question5, question6, question7, question8, question9, question10, question11, question12, question13, question14) VALUES (1, 1, '2023-01-22', 'citalopram', 1, 2, 3, 4, 5, 1, 2, 2, 3, 1, 4, 4, 5, 4)"
+
 cur.execute(wellbeing_sql)
 
+wellbeing_sql = "INSERT INTO wellbeing (id, user_id, date, antidepressant, question1, question2, question3, question4, question5, question6, question7, question8, question9, question10, question11, question12, question13, question14) VALUES (2, 1, '2023-01-28', 'citalopram', 1, 2, 3, 4, 5, 1, 2, 2, 3, 1, 4, 4, 5, 4)"
+
+cur.execute(wellbeing_sql)
+
+
 cur.execute("SELECT * FROM wellbeing")
+for row in cur:
+      print(row)
+
+
 cur.execute("SELECT * FROM user")
 for row in cur:
   print(row)
+
+con.commit()
