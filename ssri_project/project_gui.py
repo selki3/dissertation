@@ -124,6 +124,8 @@ class RegisterWindow(QMainWindow):
 
         self.password = QLabel("Password")
         self.input_password = QLineEdit()
+        self.input_password.setEchoMode(QLineEdit.Password)
+
 
         self.button_login = QPushButton("Sign up now")
         self.button_login.clicked.connect(lambda: UserModel().create_user(self.input_username.text(), self.input_password.text()))
@@ -151,6 +153,7 @@ class LoginWindow(QMainWindow):
 
         self.password = QLabel("Password")
         self.input_password = QLineEdit()
+        self.input_password.setEchoMode(QLineEdit.Password)
 
         self.button_login = QPushButton("Login now")
         self.button_login.clicked.connect(lambda: MainWindow.show_welcome_window(self, UserModel().login(self.input_username.text(), self.input_password.text())))

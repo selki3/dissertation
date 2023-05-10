@@ -1,37 +1,29 @@
 import datetime as dt
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.dates import AutoDateLocator, DateFormatter, datestr2num, date2num
+from matplotlib.dates import AutoDateLocator, DateFormatter, datestr2num, date2num, num2date
 from sklearn.tree import DecisionTreeRegressor
 from sklearn import tree
 
-
-# Doing a regression predictor 
-# Using a decision tree 
-class DigitalTwin: 
-    # Possibly consider using a dictionary instead of a list for mean? 
+class DigitalTwin:
     def __init__(self, column_list):
         self.column_list = column_list
-        
-    # Average the score
-    def total_scores(self, training_data): 
-        # List that will contain the mean score 
-        date_list = [] 
-        mean_list = [] 
+
+    def total_scores(self, training_data):
+        date_list = []
+        mean_list = []
         antidepressant_list = []
 
-        # Can't guarantee entries will be a certain order in a dictionary 
         for entry_dict in training_data:
-            # Making an assumption that there will always be one date and one score
             counter = 0
             for column_name, value in entry_dict.items():
                 if column_name in self.column_list:
                     counter += value
-                if column_name == 'date':   
+                if column_name == 'date':
                     date_list.append(value)
                 if column_name == 'antidepressant':
                     antidepressant_list.append(value)
-            mean_list.append(counter/len(self.column_list))
+            mean_list.append(round((counter/len(self.column_list))))
 
         return antidepressant_list, mean_list, date_list
 
@@ -39,14 +31,13 @@ class DigitalTwin:
         drug = drug.lower()
         if drug == "none":
             return "green"
-        if drug == "citalopram": 
+        if drug == "citalopram":
             return "magenta"
         if drug == "sertraline":
             return "blue"
         else:
             return "red"
 
-    # X will be the overall score 
     def fit_regression_model(self, dataset):
         models = dict()
         reformatted_dataset = dict()
@@ -54,47 +45,48 @@ class DigitalTwin:
         for drug, data in dataset.items():
             dates, scores = zip(*data)
             dates = datestr2num(dates)
-            
+
             reformatted_dataset[drug] = (dates, scores)
 
-            # Convert to matplotlib's internal date format.
-            x = np.array(dates).reshape(-1, 1)
-            y = np.array(scores).reshape(-1, 1)
+            # Calculate weekly change in scores as the feature 
+            scores = np.array(scores)
+
+            # Weekly change 
+            weekly_change = np.diff(scores, prepend=scores[0]).reshape(-1, 1)
 
             decision_tree = DecisionTreeRegressor()
-            decision_tree.fit(x, y)
-
+            decision_tree.fit(weekly_change, scores)
             models[drug] = decision_tree
-            print([score[-1] for score in reformatted_dataset[drug]])
-            fig = plt.figure(figsize=(25,20))
-            _ = tree.plot_tree(decision_tree, 
-                   feature_names = ([score[1] for score in data]),
-                   class_names=None,
-                   filled=True)
-            fig.savefig("decistion_tree.png")
 
-        week_from_today = dt.date.today() + dt.timedelta(weeks=8)
-        week_from_today = datestr2num(week_from_today.strftime('%Y-%m-%d'))
-        week_from_today = week_from_today.reshape(-1, 1)
-
-        predictions = dict()
-        predicted_scores = models[drug].predict(week_from_today)
-
-
-        for drug in dataset:
-            predictions[drug] = models[drug].predict(week_from_today)
-
-        # Plot the results
-        fig = plt.figure()
+        fig, ax = plt.subplots()
         fig.canvas.setWindowTitle('Wellbeing Model')
-
-        ax = fig.add_subplot(1,1,1)
 
         for drug in reformatted_dataset:
             data = reformatted_dataset[drug]
             colour = self.decide_colours(drug)
-            ax.scatter(data[0], data[1], s=20, edgecolor="black", c=colour, label=drug)
-            ax.scatter(week_from_today, predictions[drug], s=20, marker="X", c=colour, label="wellbeing prediction for " + str(drug))
+            ax.scatter(data[0], data[1], s=20, edgecolor="black", c=colour, label=str(drug))
+
+            # Predict the scores for once a week for the next month
+            end_date = date2num(dt.date.today() + dt.timedelta(weeks=4))
+            all_dates = np.arange(date2num(dt.date.today()), end_date + 1, 7)
+            all_dates = all_dates.reshape(-1, 1)
+
+            # Calculate weekly change in scores for the next month
+            initial_scores = np.array(data[1])[-1]
+            next_week_scores = models[drug].predict([[initial_scores]])[0]
+            predicted_scores = np.concatenate(([initial_scores], next_week_scores * np.ones(4)))
+            weekly_change = np.diff(predicted_scores, prepend=predicted_scores[0]).reshape(-1, 1)
+            predicted_dates = num2date(all_dates.flatten())
+
+            # Use the appropriate decision tree model for each drug to make predictions
+            predicted_scores = models[drug].predict(weekly_change)
+            predicted_dates = num2date(all_dates.flatten())
+
+            # Plot the predicted scores as a dashed line
+            ax.plot(predicted_dates, predicted_scores, linestyle='dashed',  c=colour, label="Predicted wellbeing for " + str(drug))
+
+        week_from_today = datestr2num((dt.date.today() + dt.timedelta(weeks=4)).strftime('%Y-%m-%d'))
+        week_from_today = week_from_today.reshape(-1, 1)
 
         ax.xaxis_date()  
         ax.set_title("Decision Tree Regression to show wellbeing results")
@@ -107,8 +99,4 @@ class DigitalTwin:
         ax.xaxis.set_major_formatter(DateFormatter("%Y-%m-%d"))
 
         ax.legend()
-        fig.show()
-    
-
-            
-
+        plt.show()

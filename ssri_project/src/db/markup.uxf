@@ -1,0 +1,29 @@
+<diagram program="umletino" version="15.1"><zoom_level>9</zoom_level><element><id>UMLClass</id><coordinates><x>126</x><y>90</y><w>234</w><h>270</h></coordinates><panel_attributes>_db.Wellbeing_
+--
++ id: int [PK] [NOT NULL] [AUTOINCREMENT]
++ userId : int [NOT NULL]
++ date: string [NOT NULL]
++ antidepressant: string [FK] [NOT NULL] 
++ question1: int [NOT NULL]
++ question2: int [NOT NULL]
++ question3: int [NOT NULL] 
++ question4: int [NOT NULL] 
++ question5: int [NOT NULL]
++ question6: int [NOT NULL]
++ question7: int [NOT NULL]
++ question8: int [NOT NULL]
++ question9: int [NOT NULL]
++ question10: int [NOT NULL]
++ question11: int [NOT NULL]
++ question12: int [NOT NULL]
++ question13: int [NOT NULL]
++ question14: int [NOT NULL]
+
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>540</x><y>99</y><w>225</w><h>72</h></coordinates><panel_attributes>_db.User_
+--
++ id: int [PK] [NOT NULL] [AUTOINCREMENT]
++ username: string [NOT NULL] [UNIQUE]
++ password: string [NOT NULL]</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>351</x><y>108</y><w>207</w><h>45</h></coordinates><panel_attributes>lt=-
+m1=*
+m2=1
+</panel_attributes><additional_attributes>10;20;210;20</additional_attributes></element></diagram>

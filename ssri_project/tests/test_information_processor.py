@@ -16,4 +16,4 @@ def test_connection_successful(questions):
         con = questions.create_connection()
         assert mock_con.called_with('db/antidepressant.db')
 
-def 
+
