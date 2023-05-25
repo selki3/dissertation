@@ -27,8 +27,10 @@ class UserModel(QtCore.QAbstractListModel):
             return con
     
     def create_user(self, username, password):
-        if username and password == None:
-            raise ValueError("Usernames and passwords cannot be blank")
+        if username == "": 
+            raise ValueError("Usernames cannot be blank. Try again.")
+        if password == "": 
+            raise ValueError("Passwords cannot be blank. Try again.")
 
         password = password.encode('utf-8')
         salt = bcrypt.gensalt(rounds=4)
@@ -41,7 +43,6 @@ class UserModel(QtCore.QAbstractListModel):
                 con.commit()
                 return True
             except IntegrityError as e: 
-                #TODO update this so it handles duplicate usernames by checking the e.message
                 print("There is a duplicate username! Please try again.")
     
     def login(self, username, password):
@@ -56,4 +57,6 @@ class UserModel(QtCore.QAbstractListModel):
                     print("Logged in")
                     cur.execute("SELECT id FROM user WHERE username = ?", (username,))
                     return cur.fetchone()
+                if not (bcrypt.checkpw(password, actual_password)):
+                    raise ValueError("The login details are incorrect. Please try again.")
         return None

@@ -48,15 +48,21 @@ class DigitalTwin:
 
             reformatted_dataset[drug] = (dates, scores)
 
-            # Calculate weekly change in scores as the feature 
             scores = np.array(scores)
 
-            # Weekly change 
             weekly_change = np.diff(scores, prepend=scores[0]).reshape(-1, 1)
 
             decision_tree = DecisionTreeRegressor()
             decision_tree.fit(weekly_change, scores)
             models[drug] = decision_tree
+            
+            fig = plt.figure(figsize=(25,20))
+            _ = tree.plot_tree(decision_tree, 
+                    # feature_names=str(weekly_change),  
+                    # class_names=str(drug),
+                    filled=True)
+            fig.savefig("decistion_tree.png")
+
 
         fig, ax = plt.subplots()
         fig.canvas.setWindowTitle('Wellbeing Model')
