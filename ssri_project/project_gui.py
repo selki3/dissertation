@@ -119,24 +119,30 @@ class RegisterWindow(QMainWindow):
         self.setWindowTitle('Register')
 
         layout = QGridLayout()
+        self.message = QLabel("By signing up you are giving informed consent for your information" 
+                              + " to be stored / used to track and predict your wellbeing.")
         self.username = QLabel("Username")
         self.input_username = QLineEdit()
+        self.input_username.setFixedWidth(200)
 
         self.password = QLabel("Password")
         self.input_password = QLineEdit()
+        self.input_password.setFixedWidth(200)
         self.input_password.setEchoMode(QLineEdit.Password)
 
 
         self.button_login = QPushButton("Sign up now")
+    
         self.button_login.clicked.connect(lambda: UserModel().create_user(self.input_username.text(), self.input_password.text()))
         self.button_login.clicked.connect(lambda: MainWindow.show_relogin(self))
 
-        layout.addWidget(self.username, 0, 0)
-        layout.addWidget(self.input_username, 0, 1)
+        layout.addWidget(self.message, 0, 1)
+        layout.addWidget(self.username, 1, 0)
+        layout.addWidget(self.input_username, 1, 1)
 
-        layout.addWidget(self.password, 1, 0)
-        layout.addWidget(self.input_password, 1, 1)
-        layout.addWidget(self.button_login, 2, 0)
+        layout.addWidget(self.password, 2, 0)
+        layout.addWidget(self.input_password, 2, 1)
+        layout.addWidget(self.button_login, 3, 0)
         
         widget = QWidget()
         widget.setLayout(layout)

@@ -5,6 +5,7 @@ from matplotlib.dates import AutoDateLocator, DateFormatter, datestr2num, date2n
 from sklearn.tree import DecisionTreeRegressor
 from sklearn import tree
 
+
 class DigitalTwin:
     def __init__(self, column_list):
         self.column_list = column_list
@@ -58,8 +59,6 @@ class DigitalTwin:
             
             fig = plt.figure(figsize=(25,20))
             _ = tree.plot_tree(decision_tree, 
-                    # feature_names=str(weekly_change),  
-                    # class_names=str(drug),
                     filled=True)
             fig.savefig("decistion_tree.png")
 
@@ -72,23 +71,22 @@ class DigitalTwin:
             colour = self.decide_colours(drug)
             ax.scatter(data[0], data[1], s=20, edgecolor="black", c=colour, label=str(drug))
 
-            # Predict the scores for once a week for the next month
+            # predict the score once a week 
             end_date = date2num(dt.date.today() + dt.timedelta(weeks=4))
             all_dates = np.arange(date2num(dt.date.today()), end_date + 1, 7)
             all_dates = all_dates.reshape(-1, 1)
 
-            # Calculate weekly change in scores for the next month
+            # calculate weekly change in scores 
             initial_scores = np.array(data[1])[-1]
             next_week_scores = models[drug].predict([[initial_scores]])[0]
             predicted_scores = np.concatenate(([initial_scores], next_week_scores * np.ones(4)))
             weekly_change = np.diff(predicted_scores, prepend=predicted_scores[0]).reshape(-1, 1)
             predicted_dates = num2date(all_dates.flatten())
 
-            # Use the appropriate decision tree model for each drug to make predictions
+            # use the appropriate decision tree model for each drug to make predictions
             predicted_scores = models[drug].predict(weekly_change)
             predicted_dates = num2date(all_dates.flatten())
 
-            # Plot the predicted scores as a dashed line
             ax.plot(predicted_dates, predicted_scores, linestyle='dashed',  c=colour, label="Predicted wellbeing for " + str(drug))
 
         week_from_today = datestr2num((dt.date.today() + dt.timedelta(weeks=4)).strftime('%Y-%m-%d'))
@@ -106,3 +104,4 @@ class DigitalTwin:
 
         ax.legend()
         plt.show()
+

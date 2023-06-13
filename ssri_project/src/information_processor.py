@@ -49,7 +49,6 @@ class QuestionModel(QtCore.QAbstractListModel):
         with self.connection as con:
             res = con.execute("SELECT * FROM wellbeing WHERE user_id = ?", (user,))
             res = res.fetchall()
-            con.close()
         return res 
 
     # Refactor this later 

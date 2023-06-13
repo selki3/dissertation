@@ -42,6 +42,7 @@ class MainWindow(QMainWindow):
             # Adding widgets to the layout 
         
         if not logged_in:
+            
             self.sign_in_button = QPushButton("Log in")
             self.sign_in_button.clicked.connect(self.show_login_window)
 
@@ -118,6 +119,8 @@ class RegisterWindow(QMainWindow):
         self.setWindowTitle('Register')
 
         layout = QGridLayout()
+        self.message = QLabel("By signing up you are giving informed consent for your information to be stored and used to predict your mental wellbeing")
+
         self.username = QLabel("Username")
         self.input_username = QLineEdit()
 
@@ -128,16 +131,19 @@ class RegisterWindow(QMainWindow):
         self.button_login.clicked.connect(lambda: UserModel().create_user(self.input_username.text(), self.input_password.text()))
         self.button_login.clicked.connect(lambda: MainWindow.show_relogin(self))
 
-        layout.addWidget(self.username, 0, 0)
-        layout.addWidget(self.input_username, 0, 1)
+        layout.addWidget(self.message, 1, 1)
+        # layout.addWidget(self.username, 1, 1)
+        # layout.addWidget(self.input_username, 1, 2)
 
-        layout.addWidget(self.password, 1, 0)
-        layout.addWidget(self.input_password, 1, 1)
-        layout.addWidget(self.button_login, 2, 0)
+        # layout.addWidget(self.password, 2, 1)
+        # layout.addWidget(self.input_password, 2, 2)
+        # layout.addWidget(self.button_login, 3, 0)
         
         widget = QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
+        self.show()
+
 
 class LoginWindow(QMainWindow):
     def __init__(self):

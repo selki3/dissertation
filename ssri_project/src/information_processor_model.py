@@ -18,7 +18,6 @@ class QuestionModel(QtCore.QAbstractListModel):
         self.column_list = ["question1", "question2", "question3", "question4", "question5","question6,","question7",
         "question8", "question9", "question10", "question11", "question12", "question13", "question14"]
     
-
     def data(self):
         return self.question
 
@@ -46,7 +45,8 @@ class QuestionModel(QtCore.QAbstractListModel):
     def get_id_value(self, id): 
         with self.connection as con:
             res = con.execute("SELECT * FROM wellbeing WHERE id = ?", (id,))
-        return res 
+            data = res.fetchone()
+        return data
 
     def get_all_values(self):
         with self.connection as con:
