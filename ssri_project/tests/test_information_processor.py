@@ -1,8 +1,7 @@
 from src.information_processor import QuestionModel
 import pytest
-from unittest.mock import MagicMock,Mock, patch
+from unittest.mock import MagicMock, patch
 import datetime as dt 
-
 
 @pytest.fixture
 def questions():
@@ -33,7 +32,7 @@ def test_get_all_values(questions):
         """, test_data)
         inserted_id = cur.lastrowid
         con.commit()
-
     fetched_data = questions.get_all_values(1)
+    print(list(fetched_data))
     retrieved_data = {'id': inserted_id, 'user_id': 1, 'date': '2023-06-05', 'antidepressant': 'citalopram', 'question1': 1, 'question2': 1, 'question3': 1, 'question4': 1, 'question5': 1, 'question6': 1, 'question7': 1, 'question8': 1, 'question9': 1, 'question10': 1, 'question11': 1, 'question12': 1, 'question13': 1, 'question14': 1}
     assert retrieved_data in list(fetched_data)

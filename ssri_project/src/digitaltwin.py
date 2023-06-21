@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib.dates import AutoDateLocator, DateFormatter, datestr2num, date2num, num2date
 from sklearn.tree import DecisionTreeRegressor
 from sklearn import tree
-
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 class DigitalTwin:
     def __init__(self, column_list):
@@ -51,6 +51,10 @@ class DigitalTwin:
 
             scores = np.array(scores)
 
+            when_to_split = int(len(scores) * 0.25)
+            training_scores = list(scores[i] for i in range(when_to_split))
+            testing_scores = list(scores[i] for i in range(when_to_split, len(scores)))
+
             weekly_change = np.diff(scores, prepend=scores[0]).reshape(-1, 1)
 
             decision_tree = DecisionTreeRegressor()
@@ -85,7 +89,21 @@ class DigitalTwin:
 
             # use the appropriate decision tree model for each drug to make predictions
             predicted_scores = models[drug].predict(weekly_change)
+
             predicted_dates = num2date(all_dates.flatten())
+
+            # if len(testing_scores) > 0: 
+            #     last_train_score = training_scores[-1]
+            #     predictions = []
+            #     for i in range(len(testing_scores)):
+            #         next_score_prediction = models[drug].predict([[last_train_score]])[0]
+            #         predictions.append(next_score_prediction)
+            #         last_train_score = next_score_prediction
+                
+            #     mae = mean_absolute_error(testing_scores, predictions)
+            #     rmse = mean_squared_error(testing_scores, predictions, squared=False)
+            #     print(f"Model for {drug}: MAE = {mae}, RMSE = {rmse}, drug = {drug}")
+
 
             ax.plot(predicted_dates, predicted_scores, linestyle='dashed',  c=colour, label="Predicted wellbeing for " + str(drug))
 

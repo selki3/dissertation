@@ -13,10 +13,8 @@ class QuestionController:
             pass 
         else: 
             id = abs(id)
-            print(id)
             # -1 for indexing 
             self.answers[question_id-1] = id
-        print(self.answers)
         return id 
     
     def change_medication(self, medication):

@@ -61,7 +61,6 @@ class QuestionModel(QtCore.QAbstractListModel):
             if antidepressant not in score_dictionary:
                 score_dictionary[antidepressant] = []
             score_dictionary[antidepressant].append((date, score))
-        print(score_dictionary)
         return score_dictionary
     
     def digital_twin_training(self, question_answers=None, medication=None, user_id=None):
