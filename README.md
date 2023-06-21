@@ -3,19 +3,19 @@ This project was developed on Python 3.8 so to run this project, this would be r
 
 # Installation
 Please use pip to install the following libraries:
-Matplotlib 3.7.1
-Scikit-learn 1.0.2 
-PyQt5 5.15.9
-PyQt5-Qt5 5.15.2
-PyQt5-sip 12.12.1
-pytest 7.3.2
-python-dateutil 2.8.2
-numpy 1.22.3
-DateTime 5.1
-bcrypt 4.0.1
+- Matplotlib 3.7.1
+- Scikit-learn 1.0.2 
+- PyQt5 5.15.9
+- PyQt5-Qt5 5.15.2
+- PyQt5-sip 12.12.1
+- pytest 7.3.2
+- python-dateutil 2.8.2
+- numpy 1.22.3
+- DateTime 5.1
+- bcrypt 4.0.1
 
 Please, in case, also have:
-sqlite3 3.31.1 
+- sqlite3 3.31.1 
 
 # How to Run
 Once you have installed the above libraries, navigate to the ssri_project folder, open a command terminal and type in python project_gui.py. Then, you can navigate around the application.
